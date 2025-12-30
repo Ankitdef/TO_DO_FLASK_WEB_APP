@@ -1,0 +1,16 @@
+<!-- templates/error.html -->
+{% extends 'base.html' %}
+
+{% block title %}Error - To-Do Manager{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 60px 20px;">
+    <h2 style="color: #f56565; font-size: 3rem; margin-bottom: 20px;">⚠️ Error</h2>
+    <p style="font-size: 1.2rem; color: #4a5568; margin-bottom: 30px;">
+        {{ error }}
+    </p>
+    <a href="{{ url_for('task_list_view') }}" class="btn btn-primary">
+        Go to Task List
+    </a>
+</div>
+{% endblock %}

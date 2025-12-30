@@ -1,0 +1,3 @@
+INFO 2025-12-30 17:57:23,683 app: To-Do List application startup
+INFO 2025-12-30 17:57:25,758 app: To-Do List application startup
+ERROR 2025-12-30 17:57:41,956 app: Error in task list view: Encountered unknown tag 'url'.

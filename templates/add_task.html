@@ -1,0 +1,179 @@
+<!-- templates/add_task.html -->
+{% extends 'base.html' %}
+
+{% block title %}Add Task - To-Do Manager{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #f7fafc;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #2d3748;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    
+    .form-actions button {
+        flex: 1;
+    }
+    
+    .required {
+        color: #f56565;
+    }
+    
+    .form-hint {
+        font-size: 0.85rem;
+        color: #718096;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 style="margin-bottom: 25px; color: #667eea; text-align: center;">➕ Add New Task</h2>
+    
+    <div id="message-container"></div>
+    
+    <form id="task-form">
+        <div class="form-group">
+            <label for="title">Task Title <span class="required">*</span></label>
+            <input type="text" id="title" name="title" required placeholder="Enter task title">
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Enter task description (optional)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="due_date">Due Date</label>
+            <input type="date" id="due_date" name="due_date">
+            <p class="form-hint">Optional: Set a deadline for this task</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="status">Status <span class="required">*</span></label>
+            <select id="status" name="status" required>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Create Task</button>
+            <a href="{{ url_for('task_list_view') }}" class="btn btn-primary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('task-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            title: document.getElementById('title').value.trim(),
+            description: document.getElementById('description').value.trim(),
+            due_date: document.getElementById('due_date').value || null,
+            status: document.getElementById('status').value
+        };
+        
+        // Validate title
+        if (!formData.title) {
+            showMessage('Please enter a task title', 'error');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/tasks/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showMessage('Task created successfully!', 'success');
+                
+                // Reset form
+                document.getElementById('task-form').reset();
+                
+                // Redirect after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = "{{ url_for('task_list_view') }}";
+                }, 1500);
+            } else {
+                showMessage('Error: ' + result.error, 'error');
+            }
+        } catch (error) {
+            showMessage('Network error occurred. Please try again.', 'error');
+            console.error('Error:', error);
+        }
+    });
+    
+    function showMessage(message, type) {
+        const container = document.getElementById('message-container');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+        
+        container.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+        
+        // Auto-hide error messages after 5 seconds
+        if (type === 'error') {
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    }
+    
+    // Set minimum date to today
+    document.getElementById('due_date').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}
