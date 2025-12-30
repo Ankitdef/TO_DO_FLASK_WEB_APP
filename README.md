@@ -582,4 +582,4 @@ For issues or questions, please create an issue in the GitHub repository.
 
 ---
 
-**Note**: This application uses Flask without ORM (SQLAlchemy) as per project requirements. All database operations use raw SQL queries through the `TaskDBManager` class.
+ 47f553fa22c37b46f6c4314198e7327aa4232299
